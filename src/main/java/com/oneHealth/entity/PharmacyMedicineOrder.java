@@ -19,136 +19,141 @@ import jakarta.persistence.OneToMany;
 @Entity
 public class PharmacyMedicineOrder {
 
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long orderId;
-	private String orderStatus;
-	private String paymentMode;
-	private String paymentStatus;
-	private Date orderCreated;
-	private BigDecimal totalAmount;
-	private long patientId;
-	private long transactionId;
-	private String patientName;
-	
-	@JsonManagedReference
-	@JsonIgnore
-	@OneToMany(mappedBy="pharmacyMedicineOrder",cascade = CascadeType.ALL , fetch = FetchType.EAGER)
-    private	Set<PharmacyOrderItem> item = new HashSet<>();
+    // Unique identifier for the medicine order
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long orderId;
 
-	public PharmacyMedicineOrder() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+    // Status of the medicine order
+    private String orderStatus;
 
-	public PharmacyMedicineOrder(long orderId, String orderStatus, String paymentMode, String paymentStatus,
-			Date orderCreated, BigDecimal totalAmount, long patientId, long transactionId, String patientName,
-			Set<PharmacyOrderItem> item) {
-		super();
-		this.orderId = orderId;
-		this.orderStatus = orderStatus;
-		this.paymentMode = paymentMode;
-		this.paymentStatus = paymentStatus;
-		this.orderCreated = orderCreated;
-		this.totalAmount = totalAmount;
-		this.patientId = patientId;
-		this.transactionId = transactionId;
-		this.patientName = patientName;
-		this.item = item;
-	}
+    // Payment mode used for the order
+    private String paymentMode;
 
-	@Override
-	public String toString() {
-		return "PharmacyMedicineOrder [orderId=" + orderId + ", orderStatus=" + orderStatus + ", paymentMode="
-				+ paymentMode + ", paymentStatus=" + paymentStatus + ", orderCreated=" + orderCreated + ", totalAmount="
-				+ totalAmount + ", patientId=" + patientId + ", transactionId=" + transactionId + ", patientName="
-				+ patientName + ", item=" + item + "]";
-	}
+    // Payment status of the order
+    private String paymentStatus;
 
-	public long getOrderId() {
-		return orderId;
-	}
+    // Date and time when the order was created
+    private Date orderCreated;
 
-	public void setOrderId(long orderId) {
-		this.orderId = orderId;
-	}
+    // Total amount for the order
+    private BigDecimal totalAmount;
 
-	public String getOrderStatus() {
-		return orderStatus;
-	}
+    // Unique identifier for the patient associated with the order
+    private long patientId;
 
-	public void setOrderStatus(String orderStatus) {
-		this.orderStatus = orderStatus;
-	}
+    // Unique identifier for the transaction associated with the order
+    private long transactionId;
 
-	public String getPaymentMode() {
-		return paymentMode;
-	}
+    // Name of the patient who placed the order
+    private String patientName;
 
-	public void setPaymentMode(String paymentMode) {
-		this.paymentMode = paymentMode;
-	}
+    // A set of pharmacy order items associated with this order
+    @OneToMany(mappedBy = "pharmacyMedicineOrder", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private Set<PharmacyOrderItem> item = new HashSet<>();
 
-	public String getPaymentStatus() {
-		return paymentStatus;
-	}
+    // Default constructor
+    public PharmacyMedicineOrder() {
+        super();
+    }
 
-	public void setPaymentStatus(String paymentStatus) {
-		this.paymentStatus = paymentStatus;
-	}
+    // Parameterized constructor to initialize all fields
+    public PharmacyMedicineOrder(long orderId, String orderStatus, String paymentMode, String paymentStatus,
+            Date orderCreated, BigDecimal totalAmount, long patientId, long transactionId, String patientName,
+            Set<PharmacyOrderItem> item) {
+        super();
+        this.orderId = orderId;
+        this.orderStatus = orderStatus;
+        this.paymentMode = paymentMode;
+        this.paymentStatus = paymentStatus;
+        this.orderCreated = orderCreated;
+        this.totalAmount = totalAmount;
+        this.patientId = patientId;
+        this.transactionId = transactionId;
+        this.patientName = patientName;
+        this.item = item;
+    }
 
-	public Date getOrderCreated() {
-		return orderCreated;
-	}
+    // Getter and setter methods for all fields
 
-	public void setOrderCreated(Date orderCreated) {
-		this.orderCreated = orderCreated;
-	}
+    public long getOrderId() {
+        return orderId;
+    }
 
-	public BigDecimal getTotalAmount() {
-		return totalAmount;
-	}
+    public void setOrderId(long orderId) {
+        this.orderId = orderId;
+    }
 
-	public void setTotalAmount(BigDecimal totalAmount) {
-		this.totalAmount = totalAmount;
-	}
+    public String getOrderStatus() {
+        return orderStatus;
+    }
 
-	public long getPatientId() {
-		return patientId;
-	}
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
+    }
 
-	public void setPatientId(long patientId) {
-		this.patientId = patientId;
-	}
+    public String getPaymentMode() {
+        return paymentMode;
+    }
 
-	public long getTransactionId() {
-		return transactionId;
-	}
+    public void setPaymentMode(String paymentMode) {
+        this.paymentMode = paymentMode;
+    }
 
-	public void setTransactionId(long transactionId) {
-		this.transactionId = transactionId;
-	}
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
 
-	public String getPatientName() {
-		return patientName;
-	}
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
 
-	public void setPatientName(String patientName) {
-		this.patientName = patientName;
-	}
+    public Date getOrderCreated() {
+        return orderCreated;
+    }
 
-	public Set<PharmacyOrderItem> getItem() {
-		return item;
-	}
+    public void setOrderCreated(Date orderCreated) {
+        this.orderCreated = orderCreated;
+    }
 
-	public void setItem(Set<PharmacyOrderItem> item) {
-		this.item = item;
-	}
-	
-	
-	
-	
-	
-	
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public long getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(long patientId) {
+        this.patientId = patientId;
+    }
+
+    public long getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(long transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
+
+    public Set<PharmacyOrderItem> getItem() {
+        return item;
+    }
+
+    public void setItem(Set<PharmacyOrderItem> item) {
+        this.item = item;
+    }
 }
