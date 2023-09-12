@@ -55,7 +55,7 @@ public class PharmacyMedicineOrderServiceImpl implements PharmacyMedicineOrderSe
             // Fetch patient details from an external service
             Patient patientDto = webClientBuilder.build()
                     .get()
-                    .uri("https://apigateway-yjb28-dev.apps.sandbox-m4.g2pi.p1.openshiftapps.com/patientProfile/{patient_id}", orderRequest.getPatientId())
+                    .uri("https://onehealthpatientmanagement-yjb28-dev.apps.sandbox-m4.g2pi.p1.openshiftapps.com/patientProfile/byPatientId/{patientId}", orderRequest.getPatientId())
                     .retrieve()
                     .bodyToMono(Patient.class)
                     .block();
