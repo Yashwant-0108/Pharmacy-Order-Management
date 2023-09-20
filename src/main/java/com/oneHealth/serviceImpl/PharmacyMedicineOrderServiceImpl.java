@@ -1,6 +1,8 @@
 package com.oneHealth.serviceImpl;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -21,13 +24,19 @@ import com.oneHealth.dto.MedicineCart;
 import com.oneHealth.dto.MedicineCartItem;
 import com.oneHealth.dto.MedicineOrderDetailsDto;
 import com.oneHealth.dto.OrderRequest;
+import com.oneHealth.dto.OrderUpdateDto;
 import com.oneHealth.dto.Orderdto;
 import com.oneHealth.dto.Patient;
+import com.oneHealth.dto.PharmacyMedicineOrderItemPair;
 import com.oneHealth.entity.PharmacyMedicineOrder;
 import com.oneHealth.entity.PharmacyOrderItem;
 import com.oneHealth.exception.ResourceNotFoundException;
 import com.oneHealth.repository.PharmacyMedicineOrderRepository;
 import com.oneHealth.service.PharmacyMedicineOrderService;
+
+
+
+
 
 /**
  * Implementation of the PharmacyMedicineOrderService interface.
@@ -48,6 +57,9 @@ public class PharmacyMedicineOrderServiceImpl implements PharmacyMedicineOrderSe
 
     @Autowired
     private WebClient.Builder webClientBuilder;
+    
+//    @Value("${apiGatewayUrl}")
+//   	private String apiGatewayUrl;
 
     @Override
     public Orderdto placeOrder(OrderRequest orderRequest) throws ResourceNotFoundException {
@@ -89,14 +101,17 @@ public class PharmacyMedicineOrderServiceImpl implements PharmacyMedicineOrderSe
                 pharmacyOrderItem.setPharmaAddress(cItems.getPharmaAddress());
                 pharmacyOrderItem.setPharmaId(cItems.getPharmaId());
                 pharmacyOrderItem.setPharmacyMedicineOrder(pharmacyMedicineOrder);
+                pharmacyOrderItem.setPaymentMode("None");
+                pharmacyOrderItem.setPaymentStatus("Not Paid");
+                pharmacyOrderItem.setOrderStatus("Received");
                 return pharmacyOrderItem; // Don't forget to return the mapped PharmacyOrderItem
             }).collect(Collectors.toSet());
 
             pharmacyMedicineOrder.setItem(pharmacyOrderItems);
-            pharmacyMedicineOrder.setPaymentMode(null);
-            pharmacyMedicineOrder.setPaymentStatus("Not Paid");
+            
+           
             pharmacyMedicineOrder.setOrderCreated(new Date());
-            pharmacyMedicineOrder.setOrderStatus("Received");
+            
             pharmacyMedicineOrder.setPatientId(orderRequest.getPatientId());
             pharmacyMedicineOrder.setPatientName(patientDto.getFirstName() + " " + patientDto.getLastName());
             pharmacyMedicineOrder.setTransactionId(0);
@@ -125,9 +140,19 @@ public class PharmacyMedicineOrderServiceImpl implements PharmacyMedicineOrderSe
     }
 
     @Override
-    public List<PharmacyMedicineOrder> getAllOrderByPatientId(long patientId) {
-        List<PharmacyMedicineOrder> list = pharmacyMedicineOrderRepository.findByPatientId(patientId);
-        return list;
+    public List<PharmacyMedicineOrderItemPair> getAllOrderByPatientId(long patientId) {
+				
+		List<PharmacyMedicineOrder> orders = pharmacyMedicineOrderRepository.findByPatientId(patientId);
+        List<PharmacyMedicineOrderItemPair> result = new ArrayList<>();
+
+        // Flatten the result by iterating through each order and its associated items
+        for (PharmacyMedicineOrder order : orders) {
+            for (PharmacyOrderItem item : order.getItem()) {
+                result.add(new PharmacyMedicineOrderItemPair(order, item));
+            }
+        }
+
+        return result;
     }
 
     @Override
@@ -158,19 +183,110 @@ public class PharmacyMedicineOrderServiceImpl implements PharmacyMedicineOrderSe
             throw new ResourceNotFoundException("Order Not Found With Order Id : " + orderId);
         }
     }
+    
 
-    @Override
-    public Orderdto updateOrder(Orderdto orderdto) throws ResourceNotFoundException {
-        PharmacyMedicineOrder exist = pharmacyMedicineOrderRepository.findById(orderdto.getOrderId())
-                .orElseThrow(() -> new ResourceNotFoundException("No order Found with orderId : " + orderdto.getOrderId()));
-        this.modelMapper.map(orderdto, exist);
-        pharmacyMedicineOrderRepository.save(exist);
-        logger.info("Updated order with orderId: {}", orderdto.getOrderId());
-        return this.modelMapper.map(exist, Orderdto.class);
+
+//    @Override
+//	public List<MedicineOrderDetailsDto> findMedicineOrderDetailsByPharmacyId(long pharmaId) {
+//		// TODO Auto-generated method stub
+//		List<Object[]> pharmaOrderDetails = pharmacyMedicineOrderRepository.findMedicineOrderDetailsByPharmacyId(pharmaId);
+//		List<MedicineOrderDetailsDto> pharmaOrderDetailsDtoList = convertToDto(pharmaOrderDetails);
+//
+//		return pharmaOrderDetailsDtoList;
+//	}
+    
+    
+    public List<MedicineOrderDetailsDto> convertToDto(List<Object[]> originalData) {
+        List<MedicineOrderDetailsDto> result = new ArrayList<>();
+
+        for (Object[] row : originalData) {
+            MedicineOrderDetailsDto dto = new MedicineOrderDetailsDto();
+            dto.setOrderItemId(((Integer) row[0]).longValue());
+            dto.setMedicineId(((Long) row[1]));
+            dto.setMedicineName((String) row[2]);
+            dto.setPharmaName((String) row[3]);
+            dto.setPharmaId(((long) row[4]));
+            dto.setPharmaAddress((String) row[5]);
+           // dto.setTestCategory((String) row[6]);
+          
+            dto.setPrice((Double) row[6]);
+            dto.setQuantity((Integer) row[7]);
+            dto.setOrderId(((Long) row[8]));
+            dto.setOrderStatus((String) row[9]);
+            dto.setPaymentMode((String) row[10]);
+            dto.setPaymentStatus((String) row[11]);
+            dto.setOrderCreated((Date) row[12]);
+            dto.setTotalAmount((Double) row[13]);
+            dto.setPatientId(((Long) row[14]));
+            dto.setTransactionId(((Long) row[15]));
+            dto.setPatientName((String) row[16]);
+
+            result.add(dto);
+        }
+
+        return result;
     }
 
-    @Override
-    public List<MedicineOrderDetailsDto> findMedicineOrderDetailsByPharmacyId(long pharmaId) {
-        return pharmacyMedicineOrderRepository.findPharmacyOrderDetailsByPharmacyId(pharmaId);
-    }
+	@Override
+	public boolean updateOrder(Orderdto dto) throws ResourceNotFoundException {
+		// TODO Auto-generated method stub
+        PharmacyMedicineOrder order = pharmacyMedicineOrderRepository.findById(dto.getOrderId()).orElse(null);
+
+        if (order != null) {
+            // Find the LabOrderItem within the LabTestsOrder by orderItemId
+            PharmacyOrderItem itemToUpdate = order.getItem()
+                    .stream()
+                    .filter(item -> item.getOrderItemId() == dto.getOrderId())
+                    .findFirst()
+                    .orElse(null);
+
+            if (itemToUpdate != null) {
+                // Update the item's details
+                itemToUpdate.setOrderStatus(dto.getOrderStatus());
+                itemToUpdate.setPaymentStatus(dto.getPaymentStatus());
+                itemToUpdate.setPaymentMode(dto.getPaymentMode());
+
+                // Save the updated LabOrderItem
+                pharmacyMedicineOrderRepository.save(order);
+
+                return true; // Update successful
+            }
+        }
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	
+//	public boolean updateOrder(OrderUpdateDto dto)  {
+//		 // Retrieve the LabTestsOrder by orderId
+//        PharmacyMedicineOrder order = pharmacyMedicineOrderRepository.findById(dto.getOrderId()).orElse(null);
+//
+//        if (order != null) {
+//            // Find the LabOrderItem within the LabTestsOrder by orderItemId
+//            PharmacyOrderItem itemToUpdate = order.getItem()
+//                    .stream()
+//                    .filter(item -> item.getOrderItemId() == dto.getOrderItemId())
+//                    .findFirst()
+//                    .orElse(null);
+//
+//            if (itemToUpdate != null) {
+//                // Update the item's details
+//                itemToUpdate.setOrderStatus(dto.getOrderStatus());
+//                itemToUpdate.setPaymentStatus(dto.getPaymentStatus());
+//                itemToUpdate.setPaymentMode(dto.getPaymentMode());
+//
+//                // Save the updated LabOrderItem
+//                pharmacyMedicineOrderRepository.save(order);
+//
+//                return true; // Update successful
+//            }
+//        }
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
+
+	
+	
+
+	
 }

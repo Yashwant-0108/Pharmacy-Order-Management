@@ -1,6 +1,7 @@
 package com.oneHealth.dto;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 public class MedicineOrderDetailsDto {
 
@@ -54,6 +55,7 @@ public class MedicineOrderDetailsDto {
     
     // Name of the patient
     private String patientName;
+   
 
     // Default constructor
     public MedicineOrderDetailsDto() {
@@ -187,8 +189,8 @@ public class MedicineOrderDetailsDto {
         return orderCreated;
     }
 
-    public void setOrderCreated(Date orderCreated) {
-        this.orderCreated = orderCreated;
+    public void setOrderCreated(java.util.Date row) {
+        this.orderCreated = (Date) row;
     }
 
     public Double getTotalAmount() {

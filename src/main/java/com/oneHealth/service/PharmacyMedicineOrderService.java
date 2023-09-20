@@ -5,7 +5,9 @@ import java.util.Optional;
 
 import com.oneHealth.dto.MedicineOrderDetailsDto;
 import com.oneHealth.dto.OrderRequest;
+import com.oneHealth.dto.OrderUpdateDto;
 import com.oneHealth.dto.Orderdto;
+import com.oneHealth.dto.PharmacyMedicineOrderItemPair;
 import com.oneHealth.entity.PharmacyMedicineOrder;
 import com.oneHealth.exception.ResourceNotFoundException;
 
@@ -33,7 +35,7 @@ public interface PharmacyMedicineOrderService {
      * @param patientId The ID of the patient.
      * @return A list of Orderdto objects representing the patient's orders.
      */
-    List<PharmacyMedicineOrder> getAllOrderByPatientId(long patientId);
+    List<PharmacyMedicineOrderItemPair> getAllOrderByPatientId(long patientId);
     
     /**
      * Get an order by its transactional ID.
@@ -67,7 +69,7 @@ public interface PharmacyMedicineOrderService {
      * @return The updated order as an Orderdto.
      * @throws ResourceNotFoundException If the order is not found.
      */
-    Orderdto updateOrder(Orderdto orderDto) throws ResourceNotFoundException;
+    boolean updateOrder(Orderdto orderDto) throws ResourceNotFoundException;
     
     /**
      * Find medicine order details by pharmacy ID.
@@ -75,5 +77,9 @@ public interface PharmacyMedicineOrderService {
      * @param pharmaId The ID of the pharmacy.
      * @return A list of MedicineOrderDetailsDto objects representing the order details.
      */
-    List<MedicineOrderDetailsDto> findMedicineOrderDetailsByPharmacyId(long pharmaId);
+//    List<MedicineOrderDetailsDto> findMedicineOrderDetailsByPharmacyId(long pharmaId);
+
+	
+
+	
 }

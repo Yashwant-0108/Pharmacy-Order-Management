@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.oneHealth.dto.MedicineOrderDetailsDto;
 import com.oneHealth.entity.PharmacyMedicineOrder;
@@ -13,7 +14,7 @@ import com.oneHealth.entity.PharmacyMedicineOrder;
  * This interface extends the JpaRepository to provide basic CRUD operations on the PharmacyMedicineOrder table.
  * It also includes custom queries for retrieving pharmacy order details.
  * 
- * @author YourName
+ * @author Yashwant
  * @version 1.0
  */
 public interface PharmacyMedicineOrderRepository extends JpaRepository<PharmacyMedicineOrder, Long> {
@@ -37,5 +38,7 @@ public interface PharmacyMedicineOrderRepository extends JpaRepository<PharmacyM
                     "FROM labOrderItem i " +
                     "JOIN pharmacyMedicineOrder o ON i.pharmacyMedicineOrder_orderId = o.orderId " +
                     "WHERE i.pharmaId = :pharmaId", nativeQuery = true)
-    List<MedicineOrderDetailsDto> findPharmacyOrderDetailsByPharmacyId(long pharmaId);
+    List<MedicineOrderDetailsDto> findPharmacyOrderDetailsByPharmaId(long pharmaId);
+    
+//    List<Object[]> findMedicineOrderDetailsByPharmaId(@Param("pharmaId") long pharmaId);
 }
