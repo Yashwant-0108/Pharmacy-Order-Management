@@ -18,7 +18,7 @@ import com.oneHealth.entity.PharmacyMedicineOrder;
 import com.oneHealth.exception.ResourceNotFoundException;
 import com.oneHealth.repository.PharmacyMedicineOrderRepository;
 import com.oneHealth.service.PharmacyMedicineOrderService;
-
+@CrossOrigin("*")
 @RestController
 @RequestMapping("api/pharmacyMedicalOrder")
 public class PharmacyMedicineOrderController {
